@@ -1,6 +1,7 @@
 var game = new Game;
 var WIDTH = 320;
 var HEIGHT = 400;
+var MAX_SPEED = 3;
 
 window.onload = function () {
 	Crafty.init(WIDTH, HEIGHT);
@@ -14,6 +15,11 @@ window.onload = function () {
 
 	function onMouseMove (e) {
 		var diffY = startY - e.clientY;
+		
+		if (Math.abs(diffY) > MAX_SPEED) { 
+			diffY = diffY > 0 ? MAX_SPEED : -MAX_SPEED; 
+		}
+
 		game.timeline.scrub(diffY);
 		startY = e.clientY;
 	}
