@@ -1,10 +1,14 @@
 function Timeline (opts) {
 	this.timeline = opts.timeline;
 	this.events = {};
-	this.easing = opts.easing || Easing.linear;
+	this.easing = opts.easing || "linear";
+	this.endFrame = this.lastFrame();
 }
 
 Timeline.prototype = {
+	frame: 0,
+	endFrame: 0,
+
 	getFrame: function (frame) {
 		var between = this.getFrameRange(frame);
 		if (!between) return null;
@@ -23,7 +27,7 @@ Timeline.prototype = {
 			}
 		} else {
 			if (next)
-				return getFrame(f, next);
+				return this.getFrameRange(f, next);
 			else return null;
 		}
 	},
@@ -54,10 +58,34 @@ Timeline.prototype = {
 
 	addEvent: function (f, cb) {
 		this.events[f] = cb;
+	},
+
+	/**
+	* Scrub through the global timeline
+	* by a difference in frames
+	*/
+	scrub: function (diffY) {
+		var currentFrame = clamp(this.frame | 0, 0, this.endFrame);
+		var newFrame = clamp(this.frame + diffY | 0, 0, this.endFrame);
+		var inc = currentFrame < newFrame ? 1 : -1;
+		console.log(currentFrame, newFrame, inc)
+		while (currentFrame !== newFrame + inc) {
+			var cb = this.events[currentFrame | 0];
+			if (cb) cb();
+			currentFrame += inc;
+		}
+		
+		this.frame += diffY;
+		this.frame = clamp(this.frame, 0, this.endFrame);
 	}
 };
 
 function interpolate(from, to, n, ease) {
 	ease = ease || 'linear';
-	return from + (to - from) * easing[ease](n);
+	return from + (to - from) * Easing[ease](n);
+}
+
+//clamp x between m and n
+function clamp (x, m, n) {
+	return Math.max(Math.min(x, n), m);
 }
