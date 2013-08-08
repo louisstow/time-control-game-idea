@@ -68,7 +68,7 @@ Timeline.prototype = {
 		var currentFrame = clamp(this.frame | 0, 0, this.endFrame);
 		var newFrame = clamp(this.frame + diffY | 0, 0, this.endFrame);
 		var inc = currentFrame < newFrame ? 1 : -1;
-		console.log(currentFrame, newFrame, inc)
+		
 		while (currentFrame !== newFrame + inc) {
 			var cb = this.events[currentFrame | 0];
 			if (cb) cb();
