@@ -1,5 +1,5 @@
-levels = {
-	"lvl1": {
+var levels = {
+	1: {
 		"frames": {
 			1: {
 				"next": 2,
@@ -7,8 +7,10 @@ levels = {
 				"frame": 0,
 				"easing": "quad",
 				"data": {
-					"x": 0,
-					"y": 100
+					"player": {
+						"x": 0,
+						"y": 100
+					}
 				}
 			},
 
@@ -18,8 +20,10 @@ levels = {
 				"frame": 60,
 				"easing": "quad",
 				"data": {
-					"x": 80,
-					"y": 100
+					"player": {
+						"x": 80,
+						"y": 100
+					}
 				}
 			},
 
@@ -29,8 +33,10 @@ levels = {
 				"frame": 100,
 				"easing": "quad",
 				"data": {
-					"x": 90,
-					"y": 300
+					"player": {
+						"x": 90,
+						"y": 300
+					}
 				}
 			},
 
@@ -40,10 +46,14 @@ levels = {
 				"frame": 101,
 				"easing": "quad",
 				"data": {
-					"x": 270,
-					"y": 100
+					"player": {
+						"x": 270,
+						"y": 100
+					}
 				}
 			}
-		}
+		},
+
+		objects: {}
 	}
 }

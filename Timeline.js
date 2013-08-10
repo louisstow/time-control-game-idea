@@ -1,18 +1,22 @@
-function Timeline (opts) {
-	this.timeline = opts.timeline;
+function Timeline (level) {
+	this.timeline = level.frames;
 	this.events = {};
-	this.easing = opts.easing || "linear";
 	this.endFrame = this.lastFrame();
+	this.objects = level.objects;
 }
 
 Timeline.prototype = {
 	frame: 0,
 	endFrame: 0,
 
-	getFrame: function (frame) {
+	getCurrentFrame: function (key) {
+		return this.getFrame(key, this.frame);
+	},
+
+	getFrame: function (key, frame) {
 		var between = this.getFrameRange(frame);
 		if (!between) return null;
-		return this.interpolateFrames(between.from, between.to, frame);
+		return this.interpolateFrames(key, between.from, between.to, frame);
 	},
 
 	getFrameRange: function (f, start) {
@@ -32,14 +36,19 @@ Timeline.prototype = {
 		}
 	},
 
-	interpolateFrames: function (from, to, frame) {
+	interpolateFrames: function (obj, from, to, frame) {
 		var fromFrame = from.frame || 0;
 		var toFrame = to.frame;
 		var n = (frame - fromFrame) / (Math.max(1, toFrame) - fromFrame);
-
+		
 		var lerped = {};
-		for (var key in from.data) {
-			lerped[key] = interpolate(from.data[key], to.data[key], n, this.easing);
+		for (var key in from.data[obj]) {
+			lerped[key] = interpolate(
+				from.data[obj][key], 
+				to.data[obj][key], 
+				n, 
+				from.easing
+			);
 		}
 
 		return lerped;
