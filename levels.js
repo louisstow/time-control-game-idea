@@ -47,13 +47,15 @@ var levels = {
 				"easing": "quad",
 				"data": {
 					"player": {
-						"x": 270,
+						"x": 320,
 						"y": 100
 					}
 				}
 			}
 		},
 
-		objects: {}
+		"objects": {},
+		"width": 320,
+		"height": 600
 	}
 }

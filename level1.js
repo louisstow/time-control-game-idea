@@ -11,11 +11,8 @@ levels["1"]["init"] = function (game) {
 			.color("grey");
 
 	
-	this.objects.player = Crafty.e("2D, Canvas, Color").attr({w: 50, h: 50}).color("red").bind("EnterFrame", function (f) {
-		var d = game.timeline.getFrame(game.timeline.frame);
-		if (d) this.attr(d);
-	});
-
+	this.objects.player = Crafty.e("2D, Canvas, Color").attr({w: 50, h: 50}).color("red");
+	Viewport.follow(this.objects.player, this);
 
 	game.addEvent(100, function () {
 		if (!openFlag) {
