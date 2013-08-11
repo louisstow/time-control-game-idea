@@ -49,8 +49,7 @@ Game.prototype = {
 			Crafty.removeEvent(Crafty.stage.elem, "mousemove", onMouseMove);
 		});
 
-		this.loadLevel(this.start);
-		this.onEnterFrame(); // first render of objects
+		//this.loadLevel(this.start);	
 	},
 
 	loadLevel: function (num) {
@@ -58,6 +57,7 @@ Game.prototype = {
 
 		this.timeline = this.timelines[num];
 		levels[num].init(this);
+		this.onEnterFrame(); // first render of objects
 	},
 
 	addEvent: function () {

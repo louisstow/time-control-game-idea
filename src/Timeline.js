@@ -1,5 +1,72 @@
+function Layer (frames) {
+	this.frames = frames;
+	this.endFrame = this.lastFrame();
+}
+
+Layer.prototype = {
+	getFrame: function (frame) {
+		var between = this.getFrameRange(frame, this.frames[1]);
+		if (!between) { return null; }
+
+		return this.interpolateFrames(between.from, between.to, frame);
+	},
+
+	getFrameRange: function (f, start) {
+		var prev = this.frames[start.prev];
+		var next = this.frames[start.next];
+
+		if ((!prev || f >= prev.frame) && f <= start.frame) {
+			return {
+				from: prev || start,
+				to: start
+			}
+		} else {
+			if (next) {
+				return this.getFrameRange(f, next);
+			} else { return null; }
+		}
+	},
+
+	interpolateFrames: function (from, to, frame) {
+		var fromFrame = from.frame || 0;
+		var toFrame = to.frame;
+		var n = (frame - fromFrame) / (Math.max(1, toFrame) - fromFrame);
+		var fromData = from.data || {};
+		var toData = to.data || {};
+		
+		var lerped = {};
+		for (var key in fromData) {
+			lerped[key] = interpolate(
+				fromData[key], 
+				toData[key], 
+				n, 
+				to.easing
+			);
+		}
+
+		return lerped;
+	},
+
+	lastFrame: function () {
+		var lastFrame;
+		var frame = this.frames[1];
+
+		do {
+			lastFrame = frame.frame;
+		} while (frame = this.frames[frame.next]);
+
+		return lastFrame;
+	},
+}
+
 function Timeline (level) {
-	this.timeline = level.frames;
+	this.level = level;
+	this.layers = {};
+
+	for (var key in level.layers) {
+		this.layers[key] = new Layer(level.layers[key]);
+	}
+
 	this.events = {};
 	this.endFrame = this.lastFrame();
 	this.objects = level.objects;
@@ -13,56 +80,8 @@ Timeline.prototype = {
 		return this.getFrame(key, this.frame);
 	},
 
-	getFrame: function (key, frame) {
-		var between = this.getFrameRange(frame);
-		if (!between) return null;
-		return this.interpolateFrames(key, between.from, between.to, frame);
-	},
-
-	getFrameRange: function (f, start) {
-		start = start || this.timeline[1]; //assume frame 1 exists
-		var prev = this.timeline[start.prev];
-		var next = this.timeline[start.next];
-
-		if ((!prev || f >= prev.frame) && f <= start.frame) {
-			return {
-				from: prev || start,
-				to: start
-			}
-		} else {
-			if (next)
-				return this.getFrameRange(f, next);
-			else return null;
-		}
-	},
-
-	interpolateFrames: function (obj, from, to, frame) {
-		var fromFrame = from.frame || 0;
-		var toFrame = to.frame;
-		var n = (frame - fromFrame) / (Math.max(1, toFrame) - fromFrame);
-		
-		var lerped = {};
-		for (var key in from.data[obj]) {
-			lerped[key] = interpolate(
-				from.data[obj][key], 
-				to.data[obj][key], 
-				n, 
-				from.easing
-			);
-		}
-
-		return lerped;
-	},
-
-	lastFrame: function () {
-		var lastFrame;
-		var frame = this.timeline[1];
-
-		do {
-			lastFrame = frame.frame;
-		} while (frame = this.timeline[frame.next]);
-
-		return lastFrame;
+	getFrame: function (key) {
+		return this.layers[key].getFrame(this.frame);
 	},
 
 	addEvent: function (f, cb) {
@@ -86,6 +105,17 @@ Timeline.prototype = {
 		
 		this.frame += diffY;
 		this.frame = clamp(this.frame, 0, this.endFrame);
+	},
+
+	lastFrame: function () {
+		var maxFrame = -1;
+		for (var key in this.layers) {
+			if (this.layers[key].endFrame > maxFrame) {
+				maxFrame = this.layers[key].endFrame;
+			}
+		}
+
+		return maxFrame;
 	}
 };
 

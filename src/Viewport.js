@@ -4,8 +4,8 @@ var Viewport = {
 
 	follow: function (entity, world) {
 		entity.bind("Change", function () {
-			var newX = -this.x + Crafty.viewport.width / 2;
-	 		var newY = -this.y + Crafty.viewport.height / 2;
+			var newX = -this.x + ((Crafty.viewport.width - this.w) / 2);
+	 		var newY = -this.y + ((Crafty.viewport.height - this.h) / 2);
 
 	 		// make sure the viewport keeps in the world
 	 		// boundary
