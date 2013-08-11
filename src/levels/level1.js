@@ -45,4 +45,5 @@ levels["2"]["init"] = function (game) {
 	Viewport.follow(this.objects.player, this)
 
 	this.objects.arrow = Crafty.e("2D, Canvas, arrow");
+	this.objects["arrow-2"] = Crafty.e("2D, Canvas, arrow");
 };

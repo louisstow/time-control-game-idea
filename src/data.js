@@ -100,10 +100,44 @@ var levels = {
 				2: {
 					"next": null,
 					"prev": 1,
-					"frame": 60,
+					"frame": 120,
 					"data": {
 						"x": 90,
-						"y": 480
+						"y": 580
+					}
+				}
+			},
+
+			"arrow-2": {
+				forward: true,
+
+				1: {
+					"next": 2,
+					"prev": null,
+					"frame": 0,
+					"data": {
+						"x": 170,
+						"y": 370
+					}
+				},
+
+				2: {
+					"next": 3,
+					"prev": 1,
+					"frame": 70,
+					"data": {
+						"x": 170,
+						"y": 370
+					}
+				},
+
+				3: {
+					"next": null,
+					"prev": 2,
+					"frame": 120,
+					"data": {
+						"x": 150,
+						"y": 580
 					}
 				}
 			}
