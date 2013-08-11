@@ -53,8 +53,6 @@ var levels = {
 	2: {
 		"layers": {
 			"player": {
-				forward: true,
-
 				1: {
 					"next": 2,
 					"prev": null,
@@ -70,8 +68,8 @@ var levels = {
 					"prev": 1,
 					"frame": 200,
 					"data": {
-							"x": 370,
-							"y": 480
+						"x": 370,
+						"y": 480
 					}
 				},
 
@@ -87,6 +85,8 @@ var levels = {
 			},
 
 			"arrow": {
+				forward: true,
+
 				1: {
 					"next": 2,
 					"prev": null,

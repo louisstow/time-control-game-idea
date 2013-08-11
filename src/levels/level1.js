@@ -16,7 +16,7 @@ levels["1"]["init"] = function (game) {
 	this.objects.player = Crafty.e("2D, Canvas, player");
 	Viewport.follow(this.objects.player, this);
 
-	game.addEvent(100, function () {
+	game.addEvent("player", 100, function () {
 		if (!openFlag) {
 			openFlag = true;
 			bridge.tween({rotation: 0}, 50);
@@ -25,7 +25,7 @@ levels["1"]["init"] = function (game) {
 		}
 	});
 
-	game.addEvent(60, function () {
+	game.addEvent("player", 60, function () {
 		
 		if (openFlag) {
 			// change tracks
@@ -33,7 +33,7 @@ levels["1"]["init"] = function (game) {
 		}
 	});
 
-	game.addEvent(101, function () {
+	game.addEvent("player", 101, function () {
 		console.log("FINISHED")
 	});
 

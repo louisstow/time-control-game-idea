@@ -1,11 +1,16 @@
 function Layer (frames) {
 	this.frames = frames;
 	this.frame = 0;
+	this.events = {};
 
 	this.updateLastFrame();
 }
 
 Layer.prototype = {
+	getCurrentFrame: function () {
+		return this.getFrame(this.frame);
+	},
+
 	getFrame: function (frame) {
 		var between = this.getFrameRange(frame, this.frames[1]);
 		if (!between) { return null; }
@@ -65,6 +70,15 @@ Layer.prototype = {
 	},
 
 	scrub: function (diffY) {
+		// settings to tweak time
+		if (this.frames.forward) {
+			diffY = Math.abs(diffY);
+		} else if (this.frames.backward) {
+			diffY = -Math.abs(diffY);
+		} else if (this.frames.invert) {
+			diffY = -1 * diffY;
+		}
+
 		var currentFrame = clamp(this.frame | 0, 0, this.endFrame);
 		var newFrame = clamp(this.frame + diffY | 0, 0, this.endFrame);
 		var inc = currentFrame < newFrame ? 1 : -1;
@@ -94,19 +108,18 @@ function Timeline (level) {
 }
 
 Timeline.prototype = {
-	frame: 0,
 	endFrame: 0,
 
 	getCurrentFrame: function (key) {
-		return this.getFrame(key, this.frame);
+		return this.layers[key].getCurrentFrame();
 	},
 
 	getFrame: function (key) {
 		return this.layers[key].getFrame(this.frame);
 	},
 
-	addEvent: function (f, cb) {
-		this.events[f] = cb;
+	addEvent: function (key, f, cb) {
+		this.layers[key].events[f] = cb;
 	},
 
 	fork: function (key, from, to) {
@@ -122,18 +135,9 @@ Timeline.prototype = {
 	* by a difference in frames
 	*/
 	scrub: function (diffY) {
-		var currentFrame = clamp(this.frame | 0, 0, this.endFrame);
-		var newFrame = clamp(this.frame + diffY | 0, 0, this.endFrame);
-		var inc = currentFrame < newFrame ? 1 : -1;
-		
-		while (currentFrame !== newFrame + inc) {
-			var cb = this.events[currentFrame | 0];
-			if (cb) cb();
-			currentFrame += inc;
+		for (var key in this.layers) {
+			this.layers[key].scrub(diffY);
 		}
-		
-		this.frame += diffY;
-		this.frame = clamp(this.frame, 0, this.endFrame);
 	},
 
 	updateLastFrame: function () {
