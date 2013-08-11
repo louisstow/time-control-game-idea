@@ -1,6 +1,8 @@
 function Layer (frames) {
 	this.frames = frames;
-	this.endFrame = this.lastFrame();
+	this.frame = 0;
+
+	this.updateLastFrame();
 }
 
 Layer.prototype = {
@@ -57,6 +59,25 @@ Layer.prototype = {
 
 		return lastFrame;
 	},
+
+	updateLastFrame: function () {
+		this.endFrame = this.lastFrame();
+	},
+
+	scrub: function (diffY) {
+		var currentFrame = clamp(this.frame | 0, 0, this.endFrame);
+		var newFrame = clamp(this.frame + diffY | 0, 0, this.endFrame);
+		var inc = currentFrame < newFrame ? 1 : -1;
+		
+		while (currentFrame !== newFrame + inc) {
+			var cb = this.events[currentFrame | 0];
+			if (cb) cb();
+			currentFrame += inc;
+		}
+		
+		this.frame += diffY;
+		this.frame = clamp(this.frame, 0, this.endFrame);
+	},
 }
 
 function Timeline (level) {
@@ -88,6 +109,14 @@ Timeline.prototype = {
 		this.events[f] = cb;
 	},
 
+	fork: function (key, from, to) {
+		this.layers[key].frames[from].next = to;
+		this.layers[key].frames[to].prev = from;
+
+		this.layers[key].updateLastFrame();
+		this.updateLastFrame();
+	},
+
 	/**
 	* Scrub through the global timeline
 	* by a difference in frames
@@ -105,6 +134,10 @@ Timeline.prototype = {
 		
 		this.frame += diffY;
 		this.frame = clamp(this.frame, 0, this.endFrame);
+	},
+
+	updateLastFrame: function () {
+		this.endFrame = this.lastFrame();
 	},
 
 	lastFrame: function () {

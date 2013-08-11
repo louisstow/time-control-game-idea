@@ -13,7 +13,7 @@ levels["1"]["init"] = function (game) {
 			});
 
 	
-	this.objects.player = Crafty.e("2D, Canvas, Color").attr({w: 50, h: 50}).color("red");
+	this.objects.player = Crafty.e("2D, Canvas, player");
 	Viewport.follow(this.objects.player, this);
 
 	game.addEvent(100, function () {
@@ -29,8 +29,7 @@ levels["1"]["init"] = function (game) {
 		
 		if (openFlag) {
 			// change tracks
-			game.timeline.timeline[2].next = 4;
-			game.timeline.endFrame = game.timeline.lastFrame();
+			game.timeline.fork("player", 2, 4);
 		}
 	});
 

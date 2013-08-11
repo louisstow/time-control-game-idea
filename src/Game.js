@@ -53,6 +53,8 @@ Game.prototype = {
 	},
 
 	loadLevel: function (num) {
+		Crafty("2D").destroy();
+
 		this.timelines[num] = new Timeline(levels[num]);
 
 		this.timeline = this.timelines[num];
