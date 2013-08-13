@@ -1,0 +1,155 @@
+<html>
+	<head>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+		<script src="src/crafty.js"></script>
+		<script src="src/data.js"></script>
+		
+		<script src="src/Easing.js"></script>
+		<script src="src/Timeline.js"></script>
+		<script src="src/Viewport.js"></script>
+
+		
+		<style>
+		body { margin: 0; background: #ccc; font-family: sans-serif; }
+		#cr-stage { border: 1px solid #000; background: #fff; margin: 20px }
+#frames { 
+	width: 100px; 
+	border-left:1px solid #aaa; 
+	font-size:12px; 
+	position:absolute; 
+	right:0; 
+	top: 0;
+	overflow:auto; 
+	height:100%; 
+	background:#fff;
+	cursor: default
+}
+#frames span { display:block; border-bottom:1px solid #aaa; padding:3px; text-align:center }
+#frames span:hover { background:#eee }
+#frames span.keyed { background:#FFBACB }
+#frames span.selected { border:2px solid #444; margin-top:-1px }
+		</style>
+	</head>
+	<body>
+		<div id="window">
+			<label>Width: <input id="width" type="number" value="320" /></label>
+			<label>Height: <input id="height"  type="number" value="480" /></label>
+			<label>BG: <input id="bg" value="level-" /></label>
+			<button id="play">Play</button>
+		</div>
+
+		<div id="cr-stage"></div>
+
+		<div id="frames">
+
+		</div>
+
+		<script>
+		Crafty.init(320, 480);
+
+		var width = document.getElementById("width");
+		var height = document.getElementById("height");
+		var bg = document.getElementById("bg");
+		var stage = document.getElementById("cr-stage");
+
+		width.oninput = updateWindow;
+		height.oninput = updateWindow;
+		bg.oninput = updateWindow;
+
+		function updateWindow (argument) {
+			var w = width.value;
+			var h = height.value;
+			stage.style.width = w + "px";
+			stage.style.height = h + "px";
+			stage.style.background = "url(assets/bg/" + bg.value + ".jpg) no-repeat 0 0";
+
+			Crafty.init(+w,+h);
+		}
+
+		var framecurrent = 0;
+		var framecount = 1000;
+		var currentFrame;
+		var frame = {};
+
+		function generateFrames() {
+			var html = "";
+
+			for(;framecurrent <= framecount; framecurrent+=5) {
+				html += "<span>"+framecurrent+"</span>";
+			}
+
+			$("#frames").html(html);
+		}
+
+		generateFrames();
+		var obj = Crafty.e("2D, Canvas, Color, Draggable").attr({w: 50, h: 50}).color("red");
+
+		$("#frames span").live("mousedown", function (e) {
+			currentFrame = +$(this).text();
+			console.log(e.which, e.shiftKey)
+			// clear keyframe
+			if(e.which === 3 || e.shiftKey) {
+				delete frame[currentFrame];
+				$(this).removeClass("keyed");
+
+				return false;
+			}
+
+			$("#frames span").removeClass("selected");
+			$(this).addClass("keyed selected");
+
+			//  CREATE KEYFRAMES
+			if (frame[currentFrame]) {
+				obj.attr(frame[currentFrame]);
+				return false;
+			}
+
+			frame[currentFrame] = {
+				x: obj.x,
+				y: obj.y
+			}
+		});
+
+		function transform (input) {
+			var output = {};
+			var prev = null;
+			var start = 1;
+
+			for (var key in input) {
+				output[start] = {
+					data: input[key],
+					frame: +key,
+					prev: prev,
+					next: start + 1
+				}
+
+				prev = start;
+				start++;
+			}
+
+			// set the last enxt to null
+			output[start - 1].next = null;
+
+			return output;
+		}
+
+		$("#play").click(function () {
+			var indicator = 0;
+			var data = transform(frame);
+			var timeline = new Layer(data);
+
+			(function tick () {
+				setTimeout(function () {
+					var f = timeline.getFrame(indicator++)
+					obj.attr(f)
+					if (indicator <= timeline.endFrame) { tick(); }
+				}, 16);
+			})()
+		});
+
+		var nop = function() { return false; };
+		//stop draggable
+		$("#frames").bind("selectstart", nop).bind("contextmenu", nop);
+		</script>
+	</body>
+</html>
