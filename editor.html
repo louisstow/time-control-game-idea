@@ -28,6 +28,7 @@
 #frames span:hover { background:#eee }
 #frames span.keyed { background:#FFBACB }
 #frames span.selected { border:2px solid #444; margin-top:-1px }
+#frames span.disabled { opacity: 0.4 }
 		</style>
 	</head>
 	<body>
@@ -70,6 +71,7 @@
 		var framecount = 1000;
 		var currentFrame;
 		var frame = {};
+		var hiddenFrame = {};
 
 		function generateFrames() {
 			var html = "";
@@ -82,16 +84,31 @@
 		}
 
 		generateFrames();
-		var obj = Crafty.e("2D, Canvas, Color, Draggable").attr({w: 50, h: 50}).color("red");
+		var obj = Crafty.e("2D, Canvas, Color, Draggable").attr({w: 64, h: 64}).color("red");
 
 		$("#frames span").live("mousedown", function (e) {
 			currentFrame = +$(this).text();
-			console.log(e.which, e.shiftKey)
+			
 			// clear keyframe
 			if(e.which === 3 || e.shiftKey) {
 				delete frame[currentFrame];
 				$(this).removeClass("keyed");
 
+				return false;
+			}
+
+			// hide frame from animation
+			if (e.ctrlKey) {
+				if (frame[currentFrame]) {
+					hiddenFrame[currentFrame] = frame[currentFrame];
+					delete frame[currentFrame];
+					$(this).addClass("disabled");
+				} else if (hiddenFrame[currentFrame]) {
+					frame[currentFrame] = hiddenFrame[currentFrame];
+					delete hiddenFrame[currentFrame];
+					$(this).removeClass("disabled");
+				}
+				
 				return false;
 			}
 
